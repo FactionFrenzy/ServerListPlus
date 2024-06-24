@@ -55,7 +55,6 @@ public class PaperEventHandler extends BukkitEventHandler {
         if (bukkit.getCore() == null) return; // Too early, we haven't finished initializing yet
 
         StatusRequest request = bukkit.getCore().createRequest(event.getAddress());
-        request.setProtocolVersion(event.getClient().getProtocolVersion());
         InetSocketAddress host = event.getClient().getVirtualHost();
         if (host != null) {
             request.setTarget(host);
@@ -110,7 +109,11 @@ public class PaperEventHandler extends BukkitEventHandler {
 
                 if (!playerHover.isEmpty()) {
                     for (String line : Helper.splitLines(playerHover)) {
-                        profiles.add(bukkit.getServer().createProfile(UUIDs.EMPTY, line));
+                        try {
+                            profiles.add(bukkit.getServer().createProfile(UUIDs.EMPTY, line));
+                        } catch (IllegalArgumentException e) {
+                            // TODO: dunno what to do here... Just silently ignore it to prevent the server from getting spammed with errors
+                        }
                     }
                 }
             }
